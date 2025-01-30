@@ -25,7 +25,7 @@ class Percolation:
             directions = [(-1, 0), (1, 0), (0, -1),(0, 1)] #directions sang site na i-open (up, down, left, right)
             for change_row, change_col in directions: #gina check which direction sang current site ang open para ma connect
                 new_row, new_col = row + change_row, col + change_col
-                if 1 <= new_row <= self.n and 1 <= new_col <= self.n and self.is_open(new row, new_col):
+                if 1 <= new_row <= self.n and 1 <= new_col <= self.n and self.is_open(new_row, new_col):
                     self.uf.union(index, (new_row - 1) * self.n + (new_col - 1))
 
     # is the site (row, col) open?
@@ -45,7 +45,10 @@ class Percolation:
     # does the system percolate?
     def percolates(self) -> bool:
         #if maka agi na sya from top to botton
-        pass
+        for col in range(1, self.n + 1): #gina loop ang column sa last rw
+            if self.is_full(self.n, col): #check if full ang site
+                return True
+        return False
 
     # test client (optional)
     @staticmethod
