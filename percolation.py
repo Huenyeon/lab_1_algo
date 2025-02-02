@@ -24,7 +24,7 @@ class Percolation:
             if row == 1:
                 self.uf.union(index, self.top)
             # If open ang bottom row, connect it to the imaginary bottom node
-            if row == self.n:
+            if row == self.n and self.is_full(row,col):
                 self.uf.union(index, self.bottom)
             
             # Check left and right nga open sites
@@ -60,6 +60,7 @@ class Percolation:
         
         if not self.arr[row-1][col-1]:
             return False
+        
         
         return self.uf.find(self.top) == self.uf.find(row_col_index)
         
