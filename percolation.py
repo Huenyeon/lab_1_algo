@@ -3,6 +3,8 @@ from lib.weighted_quick_union_uf import WeightedQuickUnionUF
 class Percolation:
     # creates n-by-n grid, with all sites initially blocked
     def __init__(self, n: int): #20
+        if n <= 0:
+            raise ValueError("grid size must be greater than 0")
         self.n = n
         self.arr = [[False ] * self.n for _ in range(self.n)]
         self.opened_sites = 0

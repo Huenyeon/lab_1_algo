@@ -44,20 +44,25 @@ class PercolationStats:
 
     # low endpoint of 95% confidence interval
     def confidence_lo(self) -> float:
-        return self.mean() - (1.96* (self.stddev()/sqrt(self.trials))) #not sure sure, we might not be able to use sqrt
+        return self.mean() - (1.96* (self.stddev()/ self.trials ** 0.5)) 
 
     # high endpoint of 95% confidence interval
     def confidence_hi(self) -> float:
-        return self.mean() + (1.96* (self.stddev()/sqrt(self.trials)))
+        return self.mean() + (1.96* (self.stddev()/ self.trials ** 0.5))
 
     # test client (see below)
     @staticmethod
     def main():
-        pass
+        import sys
+        if len(sys.argv) != 3:
+            print("Usage: python percolation_stats.py <n> <trials>")
+            return
+        n = int(sys.argv[1])
+        trials = int(sys.argv[2])
+        stats = PercolationStats(n, trials)
+        print(f"mean                    = {stats.mean()}")
+        print(f"stddev                  = {stats.stddev()}")
+        print(f"95% confidence interval = [{stats.confidence_lo()}, {stats.confidence_hi()}]")
 
 if __name__ == "__main__":
     PercolationStats.main()
-    stats = PercolationStats(200,100)
-    print(f"mean:  {stats.mean()}")
-    print(f"sd:  {stats.stddev()}")
-    print(f"95 percent confidence level [{stats.confidence_lo()}, {stats.confidence_hi()}]")
