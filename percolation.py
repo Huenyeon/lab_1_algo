@@ -5,28 +5,46 @@ class Percolation:
     def __init__(self, n: int): #20
         self.n = n
         self.arr = [[False ] * self.n for _ in range(self.n)]
-        self.open_sites = 0
-        self.uf = WeightedQuickUnionUF(n * n + 1)
-        self.top = n * n
-        
+        self.opened_sites = 0
+        self.uf = WeightedQuickUnionUF(self.n*self.n + 2)
+        self.top = n*n 
+        self.bottom = n*n + 1
+
 
     # opens the site (row, col) if it is not open already
-    def open(self, row: int, col: int) -> None: #(1,2)
-        if not self.is_open(row, col): #gina open ang site if inde pa open
-            self.arr[row-1][col-1] = True
-            self.open_sites += 1
+    def open(self, row: int, col: int) -> None:  
+        index = (row - 1) * self.n + (col - 1)  #formula to get the index of row col
 
-            index = (row - 1) * self.n + (col -1)
+        if self.arr[row - 1][col - 1] == False:  
+            self.arr[row - 1][col - 1] = True
+            self.opened_sites += 1
 
-            if row == 1: #connect to the top if its ara sa first row
+            # If open ang the top row, connect it to the imaginary top node
+            if row == 1:
                 self.uf.union(index, self.top)
+            # If open ang bottom row, connect it to the imaginary bottom node
+            if row == self.n:
+                self.uf.union(index, self.bottom)
+            
+            # Check left and right nga open sites
+            if col > 1 and self.arr[row - 1][col - 2] == True: 
+                left_site = (row - 1) * self.n + (col - 2)
+                self.uf.union(index, left_site)
 
-            #idk if need pa ni but in case lang
-            directions = [(-1, 0), (1, 0), (0, -1),(0, 1)] #directions sang site na i-open (up, down, left, right)
-            for change_row, change_col in directions: #gina check which direction sang current site ang open para ma connect
-                new_row, new_col = row + change_row, col + change_col
-                if 1 <= new_row <= self.n and 1 <= new_col <= self.n and self.is_open(new_row, new_col):
-                    self.uf.union(index, (new_row - 1) * self.n + (new_col - 1))
+            if col < self.n and self.arr[row - 1][col] == True:  
+                right_site = (row - 1) * self.n + col
+                self.uf.union(index, right_site)
+
+            # Check up and down nga open sites
+            if row > 1 and self.arr[row - 2][col - 1] == True:  
+                up_site = (row - 2) * self.n + (col - 1)
+                self.uf.union(index, up_site)
+
+            if row < self.n and self.arr[row][col - 1] == True: 
+                down_site = row * self.n + (col - 1)
+                self.uf.union(index, down_site)
+
+
 
     # is the site (row, col) open?
     def is_open(self, row: int, col: int) -> bool:
@@ -35,20 +53,27 @@ class Percolation:
 
     # is the site (row, col) full?
     def is_full(self, row: int, col: int) -> bool:
-        return self.is_open(row, col) and self.uf.connected((row - 1) * self.n + (col - 1), self.top)
 
+        row_col_index = (row - 1) * self.n + (col - 1)
+        
+        if not self.arr[row-1][col-1]:
+            return False
+        
+        return self.uf.find(self.top) == self.uf.find(row_col_index)
+        
+
+
+            
         
     # returns the number of open sites
     def number_of_open_sites(self) -> int:
-        return self.open_sites
+        return self.opened_sites
+
+
 
     # does the system percolate?
     def percolates(self) -> bool:
-        #if maka agi na sya from top to botton
-        for col in range(1, self.n + 1): #gina loop ang column sa last rw
-            if self.is_full(self.n, col): #check if full ang site
-                return True
-        return False
+        return self.uf.find(self.top) == self.uf.find(self.bottom)
 
     # test client (optional)
     @staticmethod
@@ -58,6 +83,4 @@ class Percolation:
 
 if __name__ == "__main__":
     Percolation.main()
-    percolation= Percolation(4)
 
-    percolation.open(2,1)
